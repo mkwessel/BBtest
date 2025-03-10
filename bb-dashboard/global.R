@@ -2,6 +2,7 @@ options(dplyr.summarise.inform = FALSE)
 library(shiny)
 library(bslib)
 library(dplyr)
+library(tidyr)
 library(leaflet)
 library(ggplot2)
 library(plotly)
@@ -20,6 +21,8 @@ logmeans = read.csv(file.path("data", "logmeans.csv")) |>
 year_min = min(logmeans$year, na.rm = TRUE)
 year_max = max(logmeans$year, na.rm = TRUE)
 
+wbids = c("", sort(unique(logmeans$wbid)))
+
 bb_nnc = sf::st_as_sf(readRDS(file.path("data", "BB_NNC.rds"))) |> 
   mutate(WBID_base = paste("Base", WBID))
 
@@ -27,5 +30,5 @@ bb_nnc = sf::st_as_sf(readRDS(file.path("data", "BB_NNC.rds"))) |>
 refline = bb_nnc |>
   sf::st_drop_geometry() |>
   select(wbid = WBID, enr = ENR, TN, TP, CHLAC) |>
-  tidyr::pivot_longer(cols = c(TN, TP, CHLAC), names_to = "masterCode", values_to = "refline") |> 
+  pivot_longer(cols = c(TN, TP, CHLAC), names_to = "masterCode", values_to = "refline") |> 
   left_join(params_df, by = join_by(masterCode))
