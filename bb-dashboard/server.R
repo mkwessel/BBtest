@@ -57,7 +57,7 @@ function(input, output, session) {
   })
   
   output$plot <- renderPlotly({
-    validate(need(!is.null(rv$wbid), "Click on a WBID polygon on map to view plots."))
+    validate(need(!is.null(rv$wbid), "Click on a WBID polygon on the map to view plots."))
     
     p = ggplot(logmeansSub()) +
       geom_col(aes(x = year, y = geo_mean), fill="blue") +
