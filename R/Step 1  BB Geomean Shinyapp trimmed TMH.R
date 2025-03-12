@@ -68,6 +68,7 @@ work_tr = work|>
 
 work_br = work_tr |>
   pivot_longer(cols = CHLAC:TP, names_to = "masterCode", values_to = "medresult")
+saveRDS(work_br, file.path("Data", "work_br.rds"))
   
 logmeans = work_br |>
   mutate(lresult = log(medresult)) |>
