@@ -32,3 +32,7 @@ refline = bb_nnc |>
   select(wbid = WBID, enr = ENR, TN, TP, CHLAC) |>
   pivot_longer(cols = c(TN, TP, CHLAC), names_to = "masterCode", values_to = "refline") |> 
   left_join(params_df, by = join_by(masterCode))
+
+basemap = leaflet(options = leafletOptions(attributionControl = FALSE)) |>
+  setView(lng = -80.231, lat = 25.61, zoom = 10) |>
+  addProviderTiles(providers$Esri.WorldTopoMap) 
