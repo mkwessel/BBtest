@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+rsconnect/
+Data/shapefiles/
+Data/bb_watershed_iwr66_123024.sas7bdat
