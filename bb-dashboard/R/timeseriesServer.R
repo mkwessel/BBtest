@@ -1,5 +1,5 @@
 
-timeseriesServer <- function(id, nav_page){
+timeseriesServer <- function(id){
   moduleServer(id, function(input, output, session) {
     
     output$map = renderLeaflet({
@@ -14,8 +14,6 @@ timeseriesServer <- function(id, nav_page){
                     group = "base")
     })
     
-    proxy <- leafletProxy("map")
-    
     observeEvent(input$map_shape_click, {
       if (input$map_shape_click$group == "base"){
         tmp = sub("Base ", "", input$map_shape_click$id)
@@ -26,7 +24,7 @@ timeseriesServer <- function(id, nav_page){
     })
     
     observe({
-      proxy |>
+      leafletProxy("map") |>
         clearGroup("selected") |> 
         addPolygons(data = nncSub(),
                     weight = 1,
@@ -77,5 +75,6 @@ timeseriesServer <- function(id, nav_page){
       ggplotly(p, tooltip = "text") |> 
         layout(margin = list(l = 50), hovermode = "x") 
     })
+    
   })
 }
