@@ -1,4 +1,10 @@
 
 function(input, output, session) {
-  timeseriesServer("ts", input$nav_page)
+  
+  nav_page <- reactive({ input$nav_page })
+  
+  timeseriesServer("ts")
+  
+  jackknifeServer("jack", nav_page)
+  
 }
