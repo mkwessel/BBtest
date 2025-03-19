@@ -4,13 +4,13 @@ jackknifeServer <- function(id, nav_page){
     
     output$map = renderLeaflet({
       basemap |> 
-        addPolygons(data = bb_wbid, 
+        addPolygons(data = bb_nnc, 
                     fillColor = "white",  
                     fillOpacity = 0.5,
                     weight = 1, 
                     opacity = 1, 
                     color = "blue", 
-                    popup = ~WBID) |> 
+                    label = ~ENR) |> 
         addLegend("bottomright", pal = cp_jack, values = breaks_jack,
                   title = "Bias (%)", opacity = 1)
     })

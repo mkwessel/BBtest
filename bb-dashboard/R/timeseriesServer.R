@@ -9,7 +9,7 @@ timeseriesServer <- function(id){
                     opacity = 1,
                     color = "blue",
                     fillOpacity = 0.1,
-                    label = ~WBID,
+                    label = ~ENR,
                     layerId = ~WBID_base,
                     group = "base")
     })
@@ -32,7 +32,7 @@ timeseriesServer <- function(id){
                     color = "blue",
                     fillColor = "yellow",
                     fillOpacity = 0.8,
-                    label = ~WBID,
+                    label = ~ENR,
                     layerId = ~WBID,
                     group = "selected")
     })
@@ -66,7 +66,7 @@ timeseriesServer <- function(id){
         geom_col(aes(x = year, y = geo_mean, text = tooltip_text), fill="blue") +
         geom_line(data = reflineSub(), aes(x = year, y = refline, text = tooltip_text), 
                   linetype = "dashed", color = "red") +
-        labs(x = "Year", y = "Geometric Average (µg/L)") +
+        labs(x = "Year", y = "Geometric Average") +
         scale_x_continuous(expand = expansion(add = c(0.3, 0.3))) +
         facet_wrap(~ param, ncol = 1, scales = "free_y") +
         theme_minimal() +

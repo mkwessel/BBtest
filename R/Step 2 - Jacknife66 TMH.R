@@ -4,6 +4,8 @@ library(sf)
 library(tidyr)
 library(purrr)
 
+pth<-"Z:/Shared/Projects/00 - Legacy Firm - Office/JANICKI/DJ20232030.00 Biscayne Bay RAP/Data/Surface Water Quality/Compilation"
+
 # work_br created in 'Step 1  BB Geomean Shinyapp trimmed TMH.R'
 work_br = readRDS(file.path("Data", "work_br.rds"))
 
@@ -111,7 +113,7 @@ wbids = c("3226G3", "3226H1", "3226H2", "3226H5", "3226H6",
           "6001C", "6003","6002")
 
 # shapefile available here: https://oneesa.egnyte.com/navigate/folder/0b9cc904-7841-4ddd-8291-34ede525ef00
-latlons <- read_sf(file.path("Data", "shapefiles", "IWR_Stations_Run66.shp")) |>
+latlons <- read_sf(file.path("Data",  "IWR_Stations_Run66.shp")) |>
   filter(WATERBODY_ %in% wbids) |>
   # geometry will be lost in left_join below so dropping it here
   st_drop_geometry() |> 
@@ -123,7 +125,7 @@ iwr_sf <- left_join(iwr_all, latlons, by = c("wbid", "dropped_sta")) |>
 saveRDS(iwr_sf, file.path("bb-dashboard", "data", "jackknife_station.rds"))
 
 # shapefile available here: https://oneesa.egnyte.com/navigate/folder/7f73a568-350b-43ac-a539-690c43f1916b
-bb_wbid <- read_sf(file.path("Data", "shapefiles", "WBIDs_Run66.shp")) |>
+bb_wbid <- read_sf(file.path("Data", "WBIDs_Run66.shp")) |>
   st_transform(crs=4326) |>
   filter(WBID %in% wbids)
 
