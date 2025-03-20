@@ -20,12 +20,12 @@ if (!file.exists(file.path("Data", "shapefiles", "IWR_Stations_Run66.shp"))){
   stop("IWR_Stations_Run66.shp not found.
   Download the files in the folder at this URL: 
   https://oneesa.egnyte.com/navigate/folder/0b9cc904-7841-4ddd-8291-34ede525ef00
-  Place the downloaded file in BBTest/Data/shapefiles")
+  Place the downloaded files in BBTest/Data/shapefiles")
 } 
 
 if (!file.exists(file.path("Data", "shapefiles", "WBIDs_Run66.shp"))){
   stop("WBIDs_Run66.shp not found.
   Download the files in the folder at this URL: 
   https://oneesa.egnyte.com/navigate/folder/7f73a568-350b-43ac-a539-690c43f1916b
-  Place the downloaded file in BBTest/Data/shapefiles")
+  Place the downloaded files in BBTest/Data/shapefiles")
 } 
