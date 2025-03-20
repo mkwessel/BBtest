@@ -18,6 +18,7 @@ jackknifeServer <- function(id, nav_page){
     observe({
       req(nav_page() == "Segmentation")
       leafletProxy("map") |>
+        clearGroup("points") |> 
         addCircleMarkers(data = filter(jackknife_station, 
                                        period == input$period & masterCode == input$param), 
                          popup = ~paste0("ENR: ", enr, 
@@ -30,7 +31,8 @@ jackknifeServer <- function(id, nav_page){
                          radius = 3, 
                          color = ~cp_jack(pbias),
                          opacity = 0.8,
-                         fillOpacity = 0.8)
+                         fillOpacity = 0.8,
+                         group = "points")
     })
     
   })
