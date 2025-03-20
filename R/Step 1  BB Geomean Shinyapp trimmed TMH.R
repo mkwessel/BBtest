@@ -5,24 +5,34 @@ library(stringr)
 library(lubridate)
 library(tidyr)
 
-wbids = c("3226G3", "3226H1", "3226H2", "3226H5", "3226H6", "3226H3", "6001D", 
-          "6001E", "6001H", "6001F", "6001G", "6001C", "6003", "6002")
-parms = c("TN", "CHLAC", "TP", "NO3", "NO2", "NO3O2", "TKN")
-pth<-"Z:/Shared/Projects/00 - Legacy Firm - Office/JANICKI/DJ20232030.00 Biscayne Bay RAP/Data/Surface Water Quality/Compilation"
+if (!file.exists(file.path("Data", "bb_watershed_iwr66_123024.sas7bdat"))){
+  # ideally, we would use the Egnyte API to automate fetching large files
+  # for now, though, we are manually moving them from Egnyte into the correct folder
+  # the code below checks for the existence of the file in the project directory
+  # and, if not found, points the user where to find them on Egnyte
+  stop("bb_watershed_iwr66_123024.sas7bdat not found.
+  Download the file from this URL: 
+  https://oneesa.egnyte.com/navigate/file/d8364a06-166c-4982-9a9a-5b4af17329c4
+  Place the downloaded file in BBTest/Data/")
+} 
 
-# dataset is very large so not committing to git
-# can be downloaded from Egnyte: https://oneesa.egnyte.com/navigate/folder/c8304c62-bf0b-4a11-b36e-12f806e15beb
-#iwr_bb_tmp = read_sas(file.path("Data", "bb_watershed_iwr66_123024.sas7bdat"))
-iwr_bb_tmp = read_sas(file.path(pth, "bb_watershed_iwr66_123024.sas7bdat"))
+bb_nnc_sub = readRDS(file.path("bb-dashboard", "data", "bb_nnc_sub.rds"))
+
+parms = c("TN", "CHLAC", "TP", "NO3", "NO2", "NO3O2", "TKN")
+
+iwr_bb_tmp = read_sas(file.path("Data", "bb_watershed_iwr66_123024.sas7bdat"))
 
 iwr_bb = iwr_bb_tmp |>
-  filter(wbid %in% wbids & masterCode %in% parms) |>
+  filter(wbid %in% unique(bb_nnc_sub$WBID) & masterCode %in% parms & year < 2024) |>
+  # add ENR to stations based on WBID
+  left_join(select(st_drop_geometry(bb_nnc_sub), wbid = WBID, ENR, Segment)) |> 
   mutate(result = ifelse(rCode %in% c("U", "T"), result/2,
                          ifelse(rCode == "I", mdl, result)),
-         period = case_when(year > 2015 ~ "New",
-                            year > 2008 ~ "Mid",
-                            year > 1994 ~ "NNC",
-                            .default = "Pre"))
+         period = case_when(year < 1995 ~ "Pre 1995",
+                            year < 2009 ~ "1995-2008",
+                            year < 2016 ~ "2009-2015",
+                            year < 2024 ~ "2016-2023",
+                            .default = NA_character_))
 
 # removing large file from memory
 rm(iwr_bb_tmp)
@@ -54,27 +64,29 @@ work = result |>
   mutate(date = mdy(paste(month, day, year, sep = "-")),
          result = as.numeric(result)) |>
   select(-c("c1", "c2", "c3", "c4", "cycle")) |>
-  group_by(wbid, period, year, sta, date, masterCode)|>
+  rename(enr = ENR) |>
+  group_by(enr, period, year, sta, date, masterCode) |>
   summarise(medresult = median(result, na.rm = TRUE)) |> 
   ungroup()
 
 work_tr = work|>
   pivot_wider(names_from = masterCode, values_from = medresult) |>
   mutate(TN2 = case_when(TKN > 0 & NO3O2 > 0 ~ TKN + NO3O2,
-                        # TKN>0 & NO3>0 & NO2>0 ~ TKN+NO3O2,
-                        #  TKN>0 & NO3>0 ~ TKN+NO3,
-                        TKN > 0 ~ TKN,
-                        .default = NA_real_),
+                         # TKN>0 & NO3>0 & NO2>0 ~ TKN+NO3O2,
+                         #  TKN>0 & NO3>0 ~ TKN+NO3,
+                         TKN > 0 ~ TKN,
+                         .default = NA_real_),
          TN = ifelse(is.na(TN), TN2, TN)) |>
   select(-TN2)
 
 work_br = work_tr |>
-  pivot_longer(cols = CHLAC:TP, names_to = "masterCode", values_to = "medresult")
+  pivot_longer(cols = c("NO3O2", "TP", "TKN", "TN", "CHLAC"), 
+               names_to = "masterCode", values_to = "medresult")
 saveRDS(work_br, file.path("Data", "work_br.rds"))
-  
+
 logmeans = work_br |>
   mutate(lresult = log(medresult)) |>
-  group_by(wbid, period, year, masterCode)|>
+  group_by(enr, period, year, masterCode)|>
   summarise(lmean = mean(lresult,na.rm=TRUE)) |> 
   ungroup() |> 
   mutate(geo_mean = exp(lmean))
