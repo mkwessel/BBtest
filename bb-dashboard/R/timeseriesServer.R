@@ -15,6 +15,7 @@ timeseriesServer <- function(id){
     })
     
     observeEvent(input$map_shape_click, {
+      req(input$map_shape_click$id)
       sel = strsplit(input$map_shape_click$id, " ")[[1]][1]
       updateSelectInput(session, "enr", selected = sel)
     })
