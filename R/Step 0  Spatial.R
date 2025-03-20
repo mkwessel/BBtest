@@ -10,6 +10,7 @@ enrs = c("ENRH1", "ENRH3", "ENRH4", "ENRH5", "ENRH6", "ENRH7", "ENRH8", "ENRH9",
 bb_nnc_sub <- readRDS(file.path("Data", "BB_NNC.rds")) |> 
   filter(ENR %in% enrs) |> 
   select(Segment, ENR, WBID, ENR, TN, TP, CHLAC)
+saveRDS(bb_nnc_sub, file.path("bb-dashboard", "data", "bb_nnc_sub.rds"))
 
 bb_nnc_sub |>
   st_drop_geometry() |> 
