@@ -10,18 +10,13 @@ timeseriesServer <- function(id){
                     color = "blue",
                     fillOpacity = 0.1,
                     label = ~ENR,
-                    layerId = ~ENR_base,
+                    layerId = ~ENR_WBID_base,
                     group = "base")
     })
     
     observeEvent(input$map_shape_click, {
-      if (input$map_shape_click$group == "base"){
-        sel = sub("Base ", "", input$map_shape_click$id)
-        updateSelectInput(session, "enr", selected = sel)
-      } 
-      if (input$map_shape_click$group == "selected"){
-        updateSelectInput(session, "enr", selected = input$map_shape_click$id)
-      } 
+      sel = strsplit(input$map_shape_click$id, " ")[[1]][1]
+      updateSelectInput(session, "enr", selected = sel)
     })
     
     observe({
@@ -34,7 +29,7 @@ timeseriesServer <- function(id){
                     fillColor = "yellow",
                     fillOpacity = 0.8,
                     label = ~ENR,
-                    layerId = ~ENR,
+                    layerId = ~ENR_WBID,
                     group = "selected")
     })
     

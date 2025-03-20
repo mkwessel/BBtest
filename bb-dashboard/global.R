@@ -23,7 +23,9 @@ year_min = min(logmeans$year, na.rm = TRUE)
 year_max = max(logmeans$year, na.rm = TRUE)
 
 bb_nnc = st_as_sf(readRDS(file.path("data", "bb_nnc_sub.rds"))) |> 
-  mutate(ENR_base = paste("Base", ENR))
+  # ENR is not unique so can't use it alone as ID
+  mutate(ENR_WBID = paste(ENR, WBID),
+         ENR_WBID_base = paste(ENR_WBID, "base"))
 
 enrs = c("", sort(unique(bb_nnc$ENR)))
 
@@ -42,7 +44,7 @@ basemap = leaflet(options = leafletOptions(attributionControl = FALSE)) |>
   addPolygons(data = ws,
               label = "Biscayne Bay Watershed",
               color = "black",
-              fillOpacity = 0)
+              fillOpacity = 0) 
 
 jackknife_station = readRDS(file.path("data", "jackknife_station.rds"))
 
