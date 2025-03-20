@@ -16,11 +16,13 @@ jackknifeServer <- function(id, nav_page){
     })
     
     observe({
-      req(nav_page() == "Jackknife")
+      req(nav_page() == "Segmentation")
       leafletProxy("map") |>
         addCircleMarkers(data = filter(jackknife_station, 
                                        period == input$period & masterCode == input$param), 
-                         popup = ~paste0("Station: ", dropped_sta,
+                         popup = ~paste0("ENR: ", enr, 
+                                         "<br>WBID: ", WBID, 
+                                         "<br>Station: ", dropped_sta,
                                          "<br>Years: ", round(n,0),
                                          "<br>Bias: ", round(pbias, 2), "%", 
                                          "<br>SE Bias: ", round(se_pbias, 2), "%"), 

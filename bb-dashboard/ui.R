@@ -7,7 +7,7 @@ page_navbar(
     timeseriesUI("ts")
   ),
   nav_panel(
-    title = "Jackknife",
+    title = "Segmentation",
     jackknifeUI("jack")
   )
 )

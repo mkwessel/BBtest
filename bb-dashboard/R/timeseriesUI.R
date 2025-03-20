@@ -10,7 +10,7 @@ timeseriesUI <- function(id){
         popover(
           bsicons::bs_icon("gear", title = "Settings"),
           title = "Settings",
-          selectInput(inputId = ns("wbid"), label = "WBID", choices = wbids)
+          selectInput(inputId = ns("enr"), label = "ENR", choices = enrs)
         )
       ),
       leafletOutput(ns("map"))

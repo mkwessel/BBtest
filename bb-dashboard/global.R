@@ -6,6 +6,7 @@ library(tidyr)
 library(leaflet)
 library(ggplot2)
 library(plotly)
+library(sf)
 
 params_ts = setNames(c("TP", "TN", "CHLAC"),
                      c("Total Phosphorous (mg/L)", "Total Nitrogen (mg/L)", "Chlorophyll a (ug/L)"))
@@ -21,38 +22,38 @@ logmeans = read.csv(file.path("data", "logmeans.csv")) |>
 year_min = min(logmeans$year, na.rm = TRUE)
 year_max = max(logmeans$year, na.rm = TRUE)
 
-wbids = c("", sort(unique(logmeans$wbid)))
+bb_nnc = st_as_sf(readRDS(file.path("data", "bb_nnc_sub.rds"))) |> 
+  mutate(ENR_base = paste("Base", ENR))
 
-bb_nnc = sf::st_as_sf(readRDS(file.path("data", "BB_NNC.rds"))) |> 
-  mutate(WBID_base = paste("Base", WBID))
+enrs = c("", sort(unique(bb_nnc$ENR)))
 
-ws<-read_sf(file.path("data","Watershed_Biscayne_Bay.shp"))|>
-  st_transform(crs=4326)
-  
+ws = read_sf(file.path("data", "Watershed_Biscayne_Bay.shp")) |>
+  st_transform(crs = 4326)
 
-# get reference line values
-refline = bb_nnc |>
-  sf::st_drop_geometry() |>
-  select(wbid = WBID, enr = ENR, TN, TP, CHLAC) |>
-  pivot_longer(cols = c(TN, TP, CHLAC), names_to = "masterCode", values_to = "refline") |> 
-  left_join(params_ts_df, by = join_by(masterCode))
+refline = left_join(readRDS(file.path("data", "refline.rds")), params_ts_df, 
+                    by = join_by(masterCode))
 
 basemap = leaflet(options = leafletOptions(attributionControl = FALSE)) |>
-  setView(lng = -80.231, lat = 25.61, zoom = 10) |>
-  addProviderTiles(providers$Esri.WorldTopoMap) |>
-  addPolygons(data=ws)
+  setView(lng = -80.27, lat = 25.61, zoom = 9) |>
+  addProviderTiles(providers$Esri.WorldTopoMap, group = "Topo") |> 
+  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") |> 
+  addLayersControl(baseGroups = c("Topo", "Satellite"),
+                   options = layersControlOptions(collapsed = FALSE)) |> 
+  addPolygons(data = ws,
+              label = "Biscayne Bay Watershed",
+              color = "black",
+              fillOpacity = 0)
 
 jackknife_station = readRDS(file.path("data", "jackknife_station.rds"))
-bb_wbid = readRDS(file.path("data", "bb_wbid.rds"))
 
-breaks_jack = c(-500, -15,-10, 10, 15, 500)
+breaks_jack = c(-500, -15, -10, 10, 15, 500)
 # Define a color palette with custom breaks
 cp_jack <- colorBin(palette = c("red", "orange", "yellow", "lightblue", "blue"), 
                     domain = jackknife_station$pbias, 
                     bins = breaks_jack)
 
-periods = c("Pre 1995", "1995-2008", "2009-2016", "2017-2023")
-params_jack =  setNames(c("TP", "TN", "TKN", "CHLAC", "NO3O2"),
-                                   c("Total Phosphorous", "Total Nitrogen", 
-                                     "Total Kjeldahl Nitrogen", "Chlorophyll a", 
-                                     "Nitrate"))
+periods = c("2016-2023", "2009-2015", "1995-2008", "Pre 1995")
+params_jack = setNames(c("TP", "TN", "TKN", "CHLAC", "NO3O2"),
+                       c("Total Phosphorous", "Total Nitrogen", 
+                         "Total Kjeldahl Nitrogen", "Chlorophyll a", 
+                         "Nitrate"))
