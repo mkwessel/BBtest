@@ -27,7 +27,7 @@ bb_nnc = st_as_sf(readRDS(file.path("data", "bb_nnc_sub.rds"))) |>
   mutate(ENR_WBID = paste(ENR, WBID),
          ENR_WBID_base = paste(ENR_WBID, "base"))
 
-enrs = c("", sort(unique(bb_nnc$ENR)))
+enrs = sort(unique(bb_nnc$ENR))
 
 ws = read_sf(file.path("data", "Watershed_Biscayne_Bay.shp")) |>
   st_transform(crs = 4326)
