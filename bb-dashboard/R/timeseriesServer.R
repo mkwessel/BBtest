@@ -57,6 +57,13 @@ timeseriesServer <- function(id){
                                      "Geo. Avg.: ", round(geo_mean, 3)))
     })
     
+    output$table <- DT::renderDataTable({
+      validate(need(input$enr != "", "Click on a ENR polygon on the map to view table."))
+      logmeansSub() |> 
+        mutate(geo_mean = round(geo_mean, 5)) |> 
+        select(ENR = enr, Parameter = param, Year = year, `Geometric Average` = geo_mean)
+    })
+    
     output$plot <- renderPlotly({
       validate(need(input$enr != "", "Click on a ENR polygon on the map to view plots."))
       p = ggplot(logmeansSub()) +

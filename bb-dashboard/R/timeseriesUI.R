@@ -1,34 +1,30 @@
 
 timeseriesUI <- function(id){
   ns = NS(id)
-  layout_columns(
-    col_widths = c(4, 8),
-    card(
-      full_screen = TRUE,
-      card_header(
-        "Map",
-        popover(
-          bsicons::bs_icon("gear", title = "Settings"),
-          title = "Settings",
-          selectInput(inputId = ns("enr"), label = "ENR", choices = enrs)
-        )
-      ),
-      leafletOutput(ns("map"))
+  layout_sidebar(
+    sidebar = sidebar(
+      selectInput(inputId = ns("enr"), label = "ENR", choices = enrs),
+      sliderInput(inputId = ns("years"), label = "Years", min = year_min,
+                  max = year_max, value = c(1995, year_max), sep = "")
     ),
-    card(
-      full_screen = TRUE,
-      card_header(
-        "Plots",
-        popover(
-          bsicons::bs_icon("gear", title = "Settings"),
-          title = "Settings",
-          sliderInput(inputId = ns("years"), label = "Years", min = year_min, 
-                      max = year_max, value = c(1995, year_max), sep = "")
+    layout_columns(
+      col_widths = c(4, 8),
+      navset_card_underline(
+        nav_panel(
+          title = "Map",
+          leafletOutput(ns("map"))
         )
       ),
-      plotlyOutput(ns("plot"))
+      navset_card_underline(
+        nav_panel(
+          title = "Plots", 
+          plotlyOutput(ns("plot"))
+        ),
+        nav_panel(
+          title = "Table",
+          DT::dataTableOutput(ns("table"))
+        )
+      )
     )
   )
 }
-
-
