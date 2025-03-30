@@ -16,16 +16,19 @@ if (!file.exists(file.path("Data", "bb_watershed_iwr66_123024.sas7bdat"))){
   Place the downloaded file in BBTest/Data/")
 } 
 
-bb_nnc_sub = readRDS(file.path("bb-dashboard", "data", "bb_nnc_sub.rds"))
+# include only stations inside the watershed and selected ENRs
+# also includes stations that are outside of the estuary
+stations_bb = readRDS(file.path("Data", "Stations_BB.rds")) |> 
+  filter(!is.na(Watershed) & ENR_sel)
 
 parms = c("TN", "CHLAC", "TP", "NO3", "NO2", "NO3O2", "TKN")
 
 iwr_bb_tmp = read_sas(file.path("Data", "bb_watershed_iwr66_123024.sas7bdat"))
 
 iwr_bb = iwr_bb_tmp |>
-  filter(wbid %in% unique(bb_nnc_sub$WBID) & masterCode %in% parms & year < 2024) |>
+  filter(sta %in% unique(stations_bb$Station) & masterCode %in% parms & year < 2024) |>
   # add ENR to stations based on WBID
-  left_join(select(st_drop_geometry(bb_nnc_sub), wbid = WBID, ENR, Segment)) |> 
+  left_join(select(st_drop_geometry(stations_bb), sta = Station, ENR)) |> 
   mutate(result = ifelse(rCode %in% c("U", "T"), result/2,
                          ifelse(rCode == "I", mdl, result)),
          period = case_when(year < 1995 ~ "Pre 1995",
@@ -33,9 +36,6 @@ iwr_bb = iwr_bb_tmp |>
                             year < 2016 ~ "2009-2015",
                             year < 2024 ~ "2016-2023",
                             .default = NA_character_))
-
-# removing large file from memory
-rm(iwr_bb_tmp)
 
 # Function to check disqualification
 check_disqual = function(code, comment, chars) {
@@ -64,8 +64,7 @@ work = result |>
   mutate(date = mdy(paste(month, day, year, sep = "-")),
          result = as.numeric(result)) |>
   select(-c("c1", "c2", "c3", "c4", "cycle")) |>
-  rename(enr = ENR) |>
-  group_by(enr, period, year, sta, date, masterCode) |>
+  group_by(ENR, period, year, sta, date, masterCode) |>
   summarise(medresult = median(result, na.rm = TRUE)) |> 
   ungroup()
 
@@ -86,7 +85,7 @@ saveRDS(work_br, file.path("Data", "work_br.rds"))
 
 logmeans = work_br |>
   mutate(lresult = log(medresult)) |>
-  group_by(enr, period, year, masterCode)|>
+  group_by(ENR, period, year, masterCode)|>
   summarise(lmean = mean(lresult,na.rm=TRUE)) |> 
   ungroup() |> 
   mutate(geo_mean = exp(lmean))
