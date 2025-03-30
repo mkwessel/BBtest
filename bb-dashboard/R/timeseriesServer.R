@@ -4,13 +4,13 @@ timeseriesServer <- function(id){
     
     output$map = renderLeaflet({
       basemap |> 
-        addPolygons(data = bb_nnc,
+        addPolygons(data = enr_bb,
                     weight = 1,
                     opacity = 1,
                     color = "blue",
                     fillOpacity = 0.1,
                     label = ~ENR,
-                    layerId = ~ENR_WBID_base,
+                    layerId = ~ENR_base,
                     group = "base")
     })
     
@@ -23,19 +23,19 @@ timeseriesServer <- function(id){
     observe({
       leafletProxy("map") |>
         clearGroup("selected") |> 
-        addPolygons(data = nncSub(),
+        addPolygons(data = enrSub(),
                     weight = 1,
                     opacity = 1,
                     color = "blue",
                     fillColor = "yellow",
                     fillOpacity = 0.8,
                     label = ~ENR,
-                    layerId = ~ENR_WBID,
+                    layerId = ~ENR,
                     group = "selected")
     })
     
-    nncSub <- reactive({
-      filter(bb_nnc, ENR == input$enr)
+    enrSub <- reactive({
+      filter(enr_bb, ENR == input$enr)
     })
     
     reflineSub <- reactive({
@@ -49,7 +49,7 @@ timeseriesServer <- function(id){
     
     logmeansSub <- reactive({
       logmeans |> 
-        filter(enr == input$enr & year >= input$years[1] & year <= input$years[2]) |> 
+        filter(ENR == input$enr & year >= input$years[1] & year <= input$years[2]) |> 
         mutate(tooltip_text = paste0("Year: ", year, "<br>",
                                      "Geo. Avg.: ", round(geo_mean, 3)))
     })
@@ -72,7 +72,7 @@ timeseriesServer <- function(id){
     table <- reactive({
       logmeansSub() |> 
         mutate(geo_mean = round(geo_mean, 5)) |> 
-        select(ENR = enr, Year = year, masterCode, geo_mean) |> 
+        select(ENR, Year = year, masterCode, geo_mean) |> 
         pivot_wider(names_from = masterCode, values_from = geo_mean)
     })
     

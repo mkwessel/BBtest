@@ -22,18 +22,19 @@ logmeans = read.csv(file.path("data", "logmeans.csv")) |>
 year_min = min(logmeans$year, na.rm = TRUE)
 year_max = max(logmeans$year, na.rm = TRUE)
 
-bb_nnc = st_as_sf(readRDS(file.path("data", "bb_nnc_sub.rds"))) |> 
-  # ENR is not unique so can't use it alone as ID
-  mutate(ENR_WBID = paste(ENR, WBID),
-         ENR_WBID_base = paste(ENR_WBID, "base"))
+enr_bb = st_as_sf(readRDS(file.path("data", "ENR_BB.rds"))) |>
+  filter(ENR_sel) |> 
+  mutate(ENR_base = paste(ENR, "base"))
 
-enrs = sort(unique(bb_nnc$ENR))
+enrs = sort(unique(enr_bb$ENR))
 
-ws = read_sf(file.path("data", "Watershed_Biscayne_Bay.shp")) |>
-  st_transform(crs = 4326)
+ws = readRDS(file.path("data", "Watershed_BB.rds"))
 
-refline = left_join(readRDS(file.path("data", "refline.rds")), params_ts_df, 
-                    by = join_by(masterCode))
+refline = readRDS(file.path("data", "refline.rds")) |>
+  ungroup() |> 
+  select(-WBID) |> 
+  distinct() |> 
+  left_join(params_ts_df, by = join_by(masterCode))
 
 basemap = leaflet(options = leafletOptions(attributionControl = FALSE)) |>
   setView(lng = -80.27, lat = 25.61, zoom = 9) |>

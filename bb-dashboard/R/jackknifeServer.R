@@ -4,7 +4,7 @@ jackknifeServer <- function(id, nav_page){
     
     output$map = renderLeaflet({
       basemap |> 
-        addPolygons(data = bb_nnc, 
+        addPolygons(data = enr_bb, 
                     fillColor = "white",  
                     fillOpacity = 0.5,
                     weight = 1, 
@@ -21,7 +21,7 @@ jackknifeServer <- function(id, nav_page){
         clearGroup("points") |> 
         addCircleMarkers(data = filter(jackknife_station, 
                                        period == input$period & masterCode == input$param), 
-                         popup = ~paste0("ENR: ", enr, 
+                         popup = ~paste0("ENR: ", ENR, 
                                          "<br>WBID: ", WBID, 
                                          "<br>Station: ", dropped_sta,
                                          "<br>Years: ", round(n,0),
