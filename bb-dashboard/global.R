@@ -43,9 +43,11 @@ basemap = leaflet(options = leafletOptions(attributionControl = FALSE)) |>
   addLayersControl(baseGroups = c("Topo", "Satellite"),
                    options = layersControlOptions(collapsed = FALSE)) |> 
   addPolygons(data = ws,
-              label = "Biscayne Bay Watershed",
+              label = ~NAME,
+              weight = 2,
+              opacity = 1,
               color = "black",
-              fillOpacity = 0) 
+              fillOpacity = 0)
 
 jackknife_station = readRDS(file.path("data", "jackknife_station.rds"))
 

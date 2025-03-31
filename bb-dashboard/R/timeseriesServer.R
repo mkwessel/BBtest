@@ -5,10 +5,10 @@ timeseriesServer <- function(id){
     output$map = renderLeaflet({
       basemap |> 
         addPolygons(data = enr_bb,
-                    weight = 1,
+                    weight = 2,
                     opacity = 1,
                     color = "blue",
-                    fillOpacity = 0.1,
+                    fillOpacity = 0,
                     label = ~ENR,
                     layerId = ~ENR_base,
                     group = "base")
@@ -24,11 +24,10 @@ timeseriesServer <- function(id){
       leafletProxy("map") |>
         clearGroup("selected") |> 
         addPolygons(data = enrSub(),
-                    weight = 1,
+                    weight = 3,
                     opacity = 1,
-                    color = "blue",
-                    fillColor = "yellow",
-                    fillOpacity = 0.8,
+                    color = "yellow",
+                    fillOpacity = 0,
                     label = ~ENR,
                     layerId = ~ENR,
                     group = "selected")
