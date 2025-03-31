@@ -101,16 +101,12 @@ iwr_all <- iwr_all |>
          se_pbias_sta = ((sta_Gse - t_se)/t_se) * 100) |>
   filter(pbias != 0)
 
-# include only stations inside the watershed and selected ENRs
-# also includes stations that are outside of the estuary
 stations_bb = readRDS(file.path("Data", "Stations_BB.rds")) |> 
-  filter(!is.na(Watershed) & ENR_sel)
+  filter(ENR_sel) |> 
   # geometry will be lost in left_join below so dropping it here
   st_drop_geometry()
 
 iwr_sf <- left_join(iwr_all, stations_bb, by = c("ENR", "dropped_sta" = "Station")) |> 
   filter(!(is.na(Lat) | is.na(Lon))) |> 
   st_as_sf(coords = c("Lon", "Lat"), crs = 4326)
-
 saveRDS(iwr_sf, file.path("bb-dashboard", "data", "jackknife_station.rds"))
-

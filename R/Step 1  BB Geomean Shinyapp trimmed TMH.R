@@ -16,10 +16,8 @@ if (!file.exists(file.path("Data", "bb_watershed_iwr66_123024.sas7bdat"))){
   Place the downloaded file in BBTest/Data/")
 } 
 
-# include only stations inside the watershed and selected ENRs
-# also includes stations that are outside of the estuary
 stations_bb = readRDS(file.path("Data", "Stations_BB.rds")) |> 
-  filter(!is.na(Watershed) & ENR_sel)
+  filter(ENR_sel)
 
 parms = c("TN", "CHLAC", "TP", "NO3", "NO2", "NO3O2", "TKN")
 
@@ -82,6 +80,12 @@ work_br = work_tr |>
   pivot_longer(cols = c("NO3O2", "TP", "TKN", "TN", "CHLAC"), 
                names_to = "masterCode", values_to = "medresult")
 saveRDS(work_br, file.path("Data", "work_br.rds"))
+
+work_br |> 
+  filter(!is.na(medresult)) |> 
+  select(ENR, Station = sta, Year = year, masterCode) |> 
+  distinct() |> 
+  saveRDS(file.path("bb-dashboard", "data", "Stations_TS.rds"))
 
 logmeans = work_br |>
   mutate(lresult = log(medresult)) |>
