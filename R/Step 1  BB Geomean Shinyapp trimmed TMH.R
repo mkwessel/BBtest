@@ -87,13 +87,24 @@ work_br |>
   distinct() |> 
   saveRDS(file.path("bb-dashboard", "data", "Stations_TS.rds"))
 
+station_ts = work_br |> 
+  filter(!is.na(medresult)) |> 
+  select(ENR, Station = sta, Year = year, masterCode) |> 
+  distinct() |> 
+  mutate(value = 1) |> 
+  full_join(crossing(distinct(select(work_br, ENR, Station = sta)),
+                     Year = unique(work_br$year),
+                     masterCode = unique(work_br$masterCode))) |> 
+  mutate(value = ifelse(is.na(value), 0, value)) |> 
+  pivot_wider(names_from = masterCode, values_from = value, values_fill = 0)
+saveRDS(station_ts, file.path("bb-dashboard", "data", "Stations_TS.rds"))
+
 logmeans = work_br |>
   mutate(lresult = log(medresult)) |>
   group_by(ENR, period, year, masterCode)|>
   summarise(lmean = mean(lresult,na.rm=TRUE)) |> 
   ungroup() |> 
   mutate(geo_mean = exp(lmean))
-
 write.csv(logmeans, file.path("bb-dashboard", "data", "logmeans.csv"), row.names = FALSE)
 
 ### all code below this point in original file has been deleted b/c
