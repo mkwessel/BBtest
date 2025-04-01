@@ -19,6 +19,11 @@ logmeans = read.csv(file.path("data", "logmeans.csv")) |>
   filter(masterCode %in% params_ts) |> 
   left_join(params_ts_df, by = join_by(masterCode))
 
+stations_ts = readRDS(file.path("data", "Stations_TS.rds"))
+
+stations_bb = readRDS(file.path("data", "Stations_BB.rds")) |>
+  filter(WBID_sel)
+
 year_min = min(logmeans$year, na.rm = TRUE)
 year_max = max(logmeans$year, na.rm = TRUE)
 

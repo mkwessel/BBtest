@@ -5,7 +5,8 @@ timeseriesUI <- function(id){
     sidebar = sidebar(
       selectInput(inputId = ns("enr"), label = "ENR", choices = enrs),
       sliderInput(inputId = ns("years"), label = "Years", min = year_min,
-                  max = year_max, value = c(1995, year_max), sep = ""),
+                  max = year_max, value = c(1995, year_max), sep = "", step = 1),
+      input_switch(ns("show_stations"), "Show Stations"),
       conditionalPanel(
         condition = 'input.nav_card == "Table"',
         downloadButton(ns("downloadTable"), "Download Table", icon = icon("download"))
