@@ -81,12 +81,6 @@ work_br = work_tr |>
                names_to = "masterCode", values_to = "medresult")
 saveRDS(work_br, file.path("Data", "work_br.rds"))
 
-work_br |> 
-  filter(!is.na(medresult)) |> 
-  select(ENR, Station = sta, Year = year, masterCode) |> 
-  distinct() |> 
-  saveRDS(file.path("bb-dashboard", "data", "Stations_TS.rds"))
-
 station_ts = work_br |> 
   filter(!is.na(medresult)) |> 
   select(ENR, Station = sta, Year = year, masterCode) |> 
