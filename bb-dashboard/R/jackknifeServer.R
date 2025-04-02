@@ -23,7 +23,7 @@ jackknifeServer <- function(id, nav_page){
                          popup = ~paste0("ENR: ", ENR, 
                                          "<br>WBID: ", WBID, 
                                          "<br>Station: ", dropped_sta,
-                                         "<br>Years: ", round(n, 0),
+                                         "<br>Years: ", round(sta_n, 0),
                                          "<br>Bias: ", round(pbias, 2), "%", 
                                          "<br>SE Bias: ", round(se_pbias, 2), "%"), 
                          label = ~dropped_sta, 
